@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ua571c.com/sitemap.xml

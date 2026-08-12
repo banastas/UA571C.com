@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="Boot, configure, test, and operate an interactive working-prop study of the UA 571-C remote sentry terminal from Aliens.">
+  <meta name="author" content="Bill Anastas">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+
+  <title>UA 571-C Remote Sentry System</title>
+  <link rel="canonical" href="https://ua571c.com/">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="site.webmanifest">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="UA571C.com">
+  <meta property="og:title" content="UA 571-C Remote Sentry System">
+  <meta property="og:description" content="A keyboard-controlled working-prop study of the remote sentry terminal from Aliens.">
+  <meta property="og:url" content="https://ua571c.com/">
+  <meta property="og:image" content="https://ua571c.com/preview.png">
+  <meta property="og:image:width" content="1152">
+  <meta property="og:image:height" content="627">
+  <meta property="og:image:alt" content="A black and yellow UA 571-C remote sentry system terminal interface.">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="UA 571-C Remote Sentry System">
+  <meta name="twitter:description" content="Boot, configure, test, and operate the fictional remote sentry terminal.">
+  <meta name="twitter:image" content="https://ua571c.com/preview.png">
+  <meta name="twitter:image:alt" content="A black and yellow UA 571-C remote sentry system terminal interface.">
+
+  <link rel="stylesheet" href="styles.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "UA571C.com",
+    "url": "https://ua571c.com/",
+    "description": "A keyboard-controlled working-prop study of the fictional UA 571-C remote sentry terminal.",
+    "creator": {
+      "@type": "Person",
+      "name": "Bill Anastas",
+      "url": "https://banast.as/"
+    },
+    "inLanguage": "en"
+  }
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#terminal">Skip to terminal</a>
+
+  <main class="stage">
+    <section class="terminal-frame" id="terminal" aria-labelledby="system-title">
+      <div class="screen" data-state="booting">
+        <div class="scanlines" aria-hidden="true"></div>
+        <div class="screen-glare" aria-hidden="true"></div>
+
+        <div class="boot" id="boot" role="status" aria-live="polite">
+          <div class="boot-mark">D</div>
+          <p class="boot-line" id="bootLine">INITIALIZING REMOTE LINK</p>
+          <div class="boot-progress"><span id="bootProgress"></span></div>
+          <button class="text-button" id="skipBoot" type="button">[ ESC ] SKIP INITIALIZATION</button>
+        </div>
+
+        <div class="terminal-ui" id="terminalUi" aria-hidden="true">
+          <div class="screen-views">
+            <section class="screen-view configuration-view" id="configurationView" aria-labelledby="system-title">
+              <header class="system-header">
+                <div class="roundel" aria-hidden="true"><span>D</span></div>
+                <h1 id="system-title"><span>UA 571-C</span>REMOTE SENTRY WEAPON SYSTEM</h1>
+                <div class="roundel" aria-hidden="true"><span>D</span></div>
+              </header>
+
+              <div class="configuration" aria-label="Sentry configuration">
+                <div class="config-cell" data-section="mode">
+                  <h2><span class="keycap" aria-hidden="true">1</span> SYSTEM<br>MODE</h2>
+                  <div class="option-list" id="modeOptions" role="group" aria-label="System mode">
+                    <button type="button" data-value="AUTO-REMOTE">AUTO-REMOTE</button>
+                    <button type="button" data-value="MAN-OVERRIDE">MAN-OVERRIDE</button>
+                    <button type="button" data-value="SEMI-AUTO">SEMI-AUTO</button>
+                  </div>
+                </div>
+
+                <div class="config-cell" data-section="weapon">
+                  <h2><span class="keycap" aria-hidden="true">2</span> WEAPON<br>STATUS</h2>
+                  <div class="option-list" id="weaponOptions" role="group" aria-label="Weapon status">
+                    <button type="button" data-value="SAFE">SAFE</button>
+                    <button type="button" data-value="ARMED">ARMED</button>
+                  </div>
+                </div>
+
+                <div class="config-cell" data-section="iff">
+                  <h2><span class="keycap" aria-hidden="true">3</span> IFF<br>STATUS</h2>
+                  <div class="option-list" id="iffOptions" role="group" aria-label="Identification friend or foe status">
+                    <button type="button" data-value="SEARCH">SEARCH</button>
+                    <button type="button" data-value="TEST">TEST</button>
+                    <button type="button" data-value="ENGAGED">ENGAGED</button>
+                    <button type="button" data-value="INTERROGATE">INTERROGATE</button>
+                  </div>
+                </div>
+
+                <div class="config-cell" data-section="test">
+                  <h2><span class="keycap" aria-hidden="true">4</span> TEST<br>ROUTINE</h2>
+                  <div class="option-list" id="testOptions" role="group" aria-label="Test routine">
+                    <button type="button" data-value="AUTO">AUTO</button>
+                    <button type="button" data-value="SELECTIVE">SELECTIVE</button>
+                  </div>
+                  <button class="run-test" id="runTest" type="button">RUN TEST</button>
+                </div>
+
+                <div class="config-cell lower" data-section="target-profile">
+                  <h2><span class="keycap" aria-hidden="true">5</span> TARGET PROFILE</h2>
+                  <div class="option-list" id="targetProfileOptions" role="group" aria-label="Target profile">
+                    <button type="button" data-value="SOFT">SOFT</button>
+                    <button type="button" data-value="SEMIHARD">SEMIHARD</button>
+                    <button type="button" data-value="HARD">HARD</button>
+                  </div>
+                </div>
+
+                <div class="config-cell lower wide" data-section="spectral-profile">
+                  <h2><span class="keycap" aria-hidden="true">6</span> SPECTRAL PROFILE</h2>
+                  <div class="option-list" id="spectralProfileOptions" role="group" aria-label="Spectral profile">
+                    <button type="button" data-value="BIO">BIO</button>
+                    <button type="button" data-value="INERT">INERT</button>
+                  </div>
+                </div>
+
+                <div class="config-cell lower" data-section="target-select">
+                  <h2><span class="keycap" aria-hidden="true">7</span> TARGET SELECT</h2>
+                  <div class="option-list" id="targetSelectOptions" role="group" aria-label="Target select">
+                    <button type="button" data-value="MULTI SPEC">MULTI SPEC</button>
+                    <button type="button" data-value="INFRA RED">INFRA RED</button>
+                    <button type="button" data-value="UV">UV</button>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="screen-view telemetry-view" id="telemetryView" aria-labelledby="telemetry-title" hidden>
+              <header class="system-header telemetry-header">
+                <div class="roundel" aria-hidden="true"><span>D</span></div>
+                <h2 id="telemetry-title"><span>UA 571-C</span>REMOTE SENTRY WEAPON SYSTEM</h2>
+                <div class="roundel" aria-hidden="true"><span>D</span></div>
+              </header>
+
+              <div class="telemetry-grid">
+                <div class="readouts">
+                  <div class="readout ammo-readout">
+                    <div class="ammo-copy">
+                      <p>Rounds<br>Remaining</p>
+                      <div class="critical-warning" id="criticalWarning" role="alert" hidden><span>Critical</span></div>
+                    </div>
+                    <span class="pointer" aria-hidden="true">&#xE081;</span>
+                    <output id="ammoOutput" aria-label="Rounds remaining">500</output>
+                  </div>
+
+                  <div class="readout time-readout">
+                    <p>TIME AT 100%<br><span>(secs)</span></p>
+                    <output id="timeOutput" aria-label="33.33 seconds of ammunition remaining"><span id="timeWhole">33</span><span class="time-decimal" aria-hidden="true">.</span><span id="timeFraction">33</span></output>
+                  </div>
+
+                </div>
+
+                <div class="meters" aria-label="System meters">
+                  <div class="meter">
+                    <p>Temp</p>
+                    <div class="gauge"><span id="tempGauge"></span><i></i></div>
+                  </div>
+                  <div class="meter">
+                    <p class="rpm-label" aria-label="R(M)"><span>R</span><span>(</span><span>M</span><span>)</span></p>
+                    <div class="gauge"><span id="rpmGauge"></span><i></i></div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+
+        </div>
+
+        <dialog class="help" id="helpDialog" aria-labelledby="helpTitle">
+          <form method="dialog">
+            <header>
+              <h2 id="helpTitle">KEYBOARD COMMANDS</h2>
+              <button value="close" aria-label="Close commands">×</button>
+            </header>
+            <div class="help-grid">
+              <kbd>1–7</kbd><span>Cycle the corresponding selector</span>
+              <kbd>SPACE</kbd><span>Hold to fire when armed</span>
+              <kbd>E</kbd><span>Toggle automatic engagement</span>
+              <kbd>T</kbd><span>Run selected test routine</span>
+              <kbd>R</kbd><span>Reload and cool the system</span>
+              <kbd>M</kbd><span>Toggle terminal sound</span>
+              <kbd>F</kbd><span>Toggle fullscreen</span>
+              <kbd>V</kbd><span>Switch configuration / live view</span>
+              <kbd>ESC</kbd><span>Cease fire / close overlay</span>
+            </div>
+            <p class="help-note">Fan-made interactive screen study. Inspired by the fictional terminal seen in <cite>Aliens</cite> (1986).</p>
+          </form>
+        </dialog>
+
+        <div class="fault-flash" id="faultFlash" aria-hidden="true"></div>
+      </div>
+    </section>
+
+    <div class="operator-panel" aria-label="Terminal controls">
+      <div class="activity" aria-live="polite">
+        <span id="activityDot"></span>
+        <p id="activityOutput">SYSTEM STANDBY // LINK D-OK</p>
+      </div>
+      <div class="fire-zone">
+        <button type="button" class="fire-control" id="fireControl"><span>HOLD</span><strong>SPACE</strong><span>TO FIRE</span></button>
+        <button type="button" class="engage-control" id="engageControl">[ E ] AUTO ENGAGE</button>
+      </div>
+      <nav class="command-bar" aria-label="Terminal commands">
+        <button type="button" data-command="view">V VIEW: CONFIG</button>
+        <button type="button" data-command="reload">R RELOAD</button>
+        <button type="button" data-command="sound">M SOUND: ON</button>
+        <button type="button" data-command="fullscreen">F FULLSCREEN</button>
+        <button type="button" data-command="help">? COMMANDS</button>
+        <span id="clock" aria-label="Mission elapsed time">00:00:00</span>
+      </nav>
+    </div>
+
+    <p class="outside-hint"><span>CLICK FIELDS OR USE THE KEYBOARD</span><button id="outsideHelp" type="button">SHOW COMMANDS [?]</button></p>
+  </main>
+
+  <script type="module" src="src/app.mjs"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "UA 571-C Remote Sentry System",
+  "short_name": "UA 571-C",
+  "description": "A keyboard-controlled working-prop study of the UA 571-C remote sentry terminal.",
+  "start_url": "/",
+  "display": "fullscreen",
+  "background_color": "#020300",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

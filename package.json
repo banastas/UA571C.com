@@ -1,0 +1,23 @@
+{
+  "name": "ua571c-com",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A keyboard-controlled working-prop study of the UA 571-C remote sentry terminal from Aliens.",
+  "homepage": "https://ua571c.com/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/banastas/UA571C.com.git"
+  },
+  "scripts": {
+    "start": "python3 -m http.server 4173",
+    "serve": "npm start",
+    "test": "node --test tests/*.test.mjs",
+    "test:browser": "playwright test",
+    "validate": "node scripts/validate.mjs",
+    "check": "npm test && npm run validate"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.62.0"
+  }
+}
