@@ -263,6 +263,7 @@ for (const deviceName of ['iPhone 13', 'iPad Pro 11']) {
     await expect(page.locator('#orientationLock')).toContainText('ROTATE DEVICE');
     await expect(page.locator('#orientationLock')).toContainText('LANDSCAPE MODE REQUIRED');
     await expect(page.locator('.stage')).toBeHidden();
+    await expect(page.locator('html')).toHaveAttribute('data-display-orientation', 'portrait');
     if (process.env.UA571C_CAPTURE_ORIENTATION && deviceName === 'iPhone 13') {
       await page.screenshot({ path: '/tmp/ua571c-orientation.png' });
     }
@@ -271,9 +272,56 @@ for (const deviceName of ['iPhone 13', 'iPad Pro 11']) {
     await page.setViewportSize({ width: portrait.height, height: portrait.width });
     await expect(page.locator('#orientationLock')).toBeHidden();
     await expect(page.locator('.stage')).toBeVisible();
+    await expect(page.locator('html')).toHaveAttribute('data-display-orientation', 'landscape');
     await context.close();
   });
 }
+
+test('shallow touch landscape never exposes the portrait interlock', async ({ browser }) => {
+  const context = await browser.newContext({
+    ...devices['iPhone 13 landscape'],
+    viewport: { width: 782, height: 360 }
+  });
+  const page = await context.newPage();
+  const browserErrors = [];
+  page.on('console', message => {
+    if (message.type() === 'error') browserErrors.push(message.text());
+  });
+  page.on('pageerror', error => browserErrors.push(error.message));
+
+  await page.goto('/');
+  await expect(page.locator('html')).toHaveAttribute('data-display-orientation', 'landscape');
+  await expect(page.locator('#orientationLock')).toBeHidden();
+  await expect(page.locator('.stage')).toBeVisible();
+
+  const layout = await page.evaluate(() => {
+    const frame = document.querySelector('.terminal-frame').getBoundingClientRect();
+    const operator = document.querySelector('.operator-panel').getBoundingClientRect();
+    const hint = document.querySelector('.outside-hint').getBoundingClientRect();
+    return {
+      viewport: { width: innerWidth, height: innerHeight },
+      visualViewport: {
+        width: window.visualViewport?.width,
+        height: window.visualViewport?.height
+      },
+      frame: { left: frame.left, right: frame.right, top: frame.top, bottom: frame.bottom, width: frame.width },
+      operator: { left: operator.left, right: operator.right, top: operator.top, bottom: operator.bottom, width: operator.width },
+      hint: { left: hint.left, right: hint.right, top: hint.top, bottom: hint.bottom },
+      scrollY,
+      overflowX: document.documentElement.scrollWidth - innerWidth
+    };
+  });
+
+  expect(layout.frame.left).toBeGreaterThanOrEqual(0);
+  expect(layout.frame.right).toBeLessThanOrEqual(layout.viewport.width + 0.5);
+  expect(layout.frame.top).toBeGreaterThanOrEqual(0);
+  expect(layout.hint.bottom).toBeLessThanOrEqual(layout.viewport.height + 0.5);
+  expect(layout.operator.width).toBeCloseTo(layout.frame.width, 0);
+  expect(layout.scrollY).toBe(0);
+  expect(layout.overflowX).toBeLessThanOrEqual(0);
+  expect(browserErrors).toEqual([]);
+  await context.close();
+});
 
 test('rotating to portrait safely ceases automatic engagement', async ({ browser }) => {
   const context = await browser.newContext({ ...devices['iPhone 13 landscape'] });
@@ -286,6 +334,7 @@ test('rotating to portrait safely ceases automatic engagement', async ({ browser
   const landscape = page.viewportSize();
   await page.setViewportSize({ width: landscape.height, height: landscape.width });
   await expect(page.locator('#orientationLock')).toBeVisible();
+  await expect(page.locator('html')).toHaveAttribute('data-display-orientation', 'portrait');
   await expect(page.locator('#engageControl')).toHaveText('[ E ] AUTO ENGAGE');
   await expect(page.locator('#activityDot')).not.toHaveClass(/active/);
   await context.close();

@@ -645,6 +645,31 @@ button { -webkit-tap-highlight-color: transparent; }
   }
 }
 
+/*
+ * iOS Safari can retain its portrait media-query result for a frame while the
+ * visual viewport has already rotated. The application synchronizes this
+ * attribute from visualViewport so a stale portrait result cannot cover a
+ * correctly sized landscape terminal.
+ */
+html[data-display-orientation="landscape"] body { overflow-x: hidden; overflow-y: auto; }
+html[data-display-orientation="landscape"] .skip-link { display: inline; }
+html[data-display-orientation="landscape"] .stage { display: grid; }
+html[data-display-orientation="landscape"] .orientation-lock { display: none; }
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .stage {
+    min-height: 100svh;
+    align-content: start;
+    gap: .4rem;
+    padding: max(.35rem, env(safe-area-inset-top)) max(.5rem, env(safe-area-inset-right)) max(.35rem, env(safe-area-inset-bottom)) max(.5rem, env(safe-area-inset-left));
+  }
+  .terminal-frame,
+  .operator-panel {
+    width: min(96vw, 1400px, calc((100svh - 6.25rem) * 1.84));
+  }
+  .outside-hint { min-height: 1.5rem; font-size: .56rem; }
+}
+
 @media (max-aspect-ratio: 4 / 5) {
   .stage { align-content: start; padding-inline: 1.5vw; }
   .terminal-frame { width: 97vw; }

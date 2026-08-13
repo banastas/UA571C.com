@@ -40,7 +40,7 @@ requires updating its filename and the matching `@font-face` URL.
 
 Every selector and command is also clickable or tappable. Audio is synthesized locally with the Web Audio API and begins only after user input.
 
-Phones and tablets operate in landscape. Installed/fullscreen mode requests a landscape display, while portrait browser sessions show a rotation interlock and safely cease any active or automatic fire until the device returns to landscape.
+Phones and tablets operate in landscape. Installed/fullscreen mode requests a landscape display, while portrait browser sessions show a rotation interlock and safely cease any active or automatic fire until the device returns to landscape. The interlock follows the visual viewport during rotation so transient iOS Safari orientation-query lag cannot obscure the landscape terminal.
 
 ## Local development
 
@@ -83,6 +83,7 @@ The automated suite covers:
 - Readable original GRiD face assignments across boot, configuration, telemetry, and command-overlay states
 - Optical decimal spacing for the fixed-cell TypeBlock countdown at initial, active, and critical values
 - Landscape-only phone and tablet operation with portrait interlock and safe firing suspension
+- Shallow iOS-style landscape viewports without a stale portrait interlock or horizontal overflow
 
 The interface has also been exercised in desktop and mobile browsers for boot, keyboard arming, view switching, firing, reload, the test routine, the alternating critical warning, the command dialog, touch input, responsive bounds, and console errors.
 

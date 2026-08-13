@@ -32,6 +32,7 @@ const faultFlash = $('#faultFlash');
 const configurationView = $('#configurationView');
 const telemetryView = $('#telemetryView');
 const portraitGate = matchMedia('(orientation: portrait) and (pointer: coarse)');
+const coarsePointerGate = matchMedia('(pointer: coarse)');
 
 const sectionMap = {
   mode: '#modeOptions',
@@ -256,8 +257,17 @@ async function toggleFullscreen() {
   }
 }
 
-function enforceLandscape() {
-  if (!portraitGate.matches) return;
+function usesPortraitTouchLayout() {
+  const viewport = window.visualViewport;
+  const width = viewport?.width ?? window.innerWidth;
+  const height = viewport?.height ?? window.innerHeight;
+  return coarsePointerGate.matches && height > width;
+}
+
+function syncDisplayOrientation() {
+  const portrait = usesPortraitTouchLayout();
+  document.documentElement.dataset.displayOrientation = portrait ? 'portrait' : 'landscape';
+  if (!portrait) return;
   if (autoTimer) window.clearInterval(autoTimer);
   autoTimer = null;
   stopFiring();
@@ -358,9 +368,19 @@ document.addEventListener('keyup', (event) => {
 
 window.addEventListener('blur', stopFiring);
 document.addEventListener('visibilitychange', () => { if (document.hidden) stopFiring(); });
-if (portraitGate.addEventListener) portraitGate.addEventListener('change', enforceLandscape);
-else portraitGate.addListener?.(enforceLandscape);
-enforceLandscape();
+if (portraitGate.addEventListener) portraitGate.addEventListener('change', syncDisplayOrientation);
+else portraitGate.addListener?.(syncDisplayOrientation);
+if (coarsePointerGate.addEventListener) coarsePointerGate.addEventListener('change', syncDisplayOrientation);
+else coarsePointerGate.addListener?.(syncDisplayOrientation);
+window.addEventListener('resize', syncDisplayOrientation);
+window.visualViewport?.addEventListener('resize', syncDisplayOrientation);
+window.screen.orientation?.addEventListener?.('change', syncDisplayOrientation);
+window.addEventListener('orientationchange', () => {
+  syncDisplayOrientation();
+  window.requestAnimationFrame(syncDisplayOrientation);
+  window.setTimeout(syncDisplayOrientation, 250);
+});
+syncDisplayOrientation();
 
 window.setInterval(() => {
   if (!state.firing && state.temperature > 18) {
