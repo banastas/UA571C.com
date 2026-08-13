@@ -266,6 +266,19 @@ for (const deviceName of ['iPhone 13', 'iPad Pro 11']) {
     await expect(page.locator('#orientationLock .orientation-mark')).toHaveCount(0);
     await expect(page.locator('.stage')).toBeHidden();
     await expect(page.locator('html')).toHaveAttribute('data-display-orientation', 'portrait');
+
+    const warningSpacing = await page.evaluate(() => {
+      const copyAbove = document.querySelector('.orientation-panel p').getBoundingClientRect();
+      const deviceStage = document.querySelector('.orientation-device-stage').getBoundingClientRect();
+      const copyBelow = document.querySelector('.orientation-panel strong').getBoundingClientRect();
+      return {
+        above: deviceStage.top - copyAbove.bottom,
+        below: copyBelow.top - deviceStage.bottom
+      };
+    });
+    expect(warningSpacing.above).toBeGreaterThanOrEqual(12);
+    expect(warningSpacing.below).toBeGreaterThanOrEqual(12);
+
     if (process.env.UA571C_CAPTURE_ORIENTATION && deviceName === 'iPhone 13') {
       await page.screenshot({ path: '/tmp/ua571c-orientation.png' });
     }
@@ -339,6 +352,85 @@ test('shallow touch landscape never exposes the portrait interlock', async ({ br
   expect(layout.operator.width).toBeCloseTo(layout.frame.width, 0);
   expect(layout.scrollY).toBe(0);
   expect(layout.overflowX).toBeLessThanOrEqual(0);
+  expect(browserErrors).toEqual([]);
+  await context.close();
+});
+
+test('configuration scales inside a wide, shallow Safari landscape', async ({ browser }) => {
+  const context = await browser.newContext({
+    ...devices['iPhone 13 landscape'],
+    viewport: { width: 874, height: 390 }
+  });
+  const page = await context.newPage();
+  const browserErrors = [];
+  page.on('console', message => {
+    if (message.type() === 'error') browserErrors.push(message.text());
+  });
+  page.on('pageerror', error => browserErrors.push(error.message));
+
+  await page.goto('/');
+  await page.locator('#skipBoot').tap();
+  await expect(page.locator('#configurationView')).toBeVisible();
+  await expect(page.locator('#orientationLock')).toBeHidden();
+
+  const layout = await page.evaluate(() => {
+    const rect = (element) => {
+      const box = element.getBoundingClientRect();
+      return { left: box.left, right: box.right, top: box.top, bottom: box.bottom };
+    };
+    const textRect = (element) => {
+      const range = document.createRange();
+      range.selectNodeContents(element);
+      const box = range.getBoundingClientRect();
+      return { left: box.left, right: box.right, top: box.top, bottom: box.bottom };
+    };
+
+    const header = document.querySelector('#configurationView .system-header');
+    return {
+      viewport: { width: innerWidth, height: innerHeight },
+      frame: rect(document.querySelector('.terminal-frame')),
+      hint: rect(document.querySelector('.outside-hint')),
+      header: rect(header),
+      headerText: textRect(header.querySelector('h1')),
+      cells: [...document.querySelectorAll('#configurationView .config-cell')].map((cell) => {
+        const heading = cell.querySelector('h2');
+        return {
+          outer: rect(cell),
+          heading: rect(heading),
+          headingText: textRect(heading),
+          options: [...cell.querySelectorAll('button')].map((button) => ({
+            outer: rect(button),
+            text: textRect(button)
+          }))
+        };
+      }),
+      scrollY,
+      overflowX: document.documentElement.scrollWidth - innerWidth,
+      overflowY: document.documentElement.scrollHeight - innerHeight
+    };
+  });
+
+  const expectInside = (inner, outer) => {
+    expect(inner.left).toBeGreaterThanOrEqual(outer.left - 0.5);
+    expect(inner.right).toBeLessThanOrEqual(outer.right + 0.5);
+    expect(inner.top).toBeGreaterThanOrEqual(outer.top - 0.5);
+    expect(inner.bottom).toBeLessThanOrEqual(outer.bottom + 0.5);
+  };
+
+  expect(layout.frame.top).toBeGreaterThanOrEqual(0);
+  expect(layout.hint.bottom).toBeLessThanOrEqual(layout.viewport.height + 0.5);
+  expectInside(layout.headerText, layout.header);
+  layout.cells.forEach((cell) => {
+    expectInside(cell.headingText, cell.heading);
+    expectInside(cell.headingText, cell.outer);
+    cell.options.forEach((option) => {
+      expectInside(option.text, option.outer);
+      expectInside(option.text, cell.outer);
+    });
+  });
+  expect(layout.scrollY).toBe(0);
+  expect(layout.overflowX).toBeLessThanOrEqual(0);
+  expect(layout.overflowY).toBeLessThanOrEqual(0);
   expect(browserErrors).toEqual([]);
   await context.close();
 });

@@ -109,9 +109,16 @@ button { -webkit-tap-highlight-color: transparent; }
 .orientation-panel p { margin: 0; font-size: clamp(.85rem, 4vw, 1.35rem); line-height: 1.25; }
 .orientation-panel strong { font-size: clamp(1rem, 5vw, 1.65rem); font-weight: 400; }
 .orientation-panel small { font-size: clamp(.55rem, 2.6vw, .8rem); }
+.orientation-device-stage {
+  display: grid;
+  width: clamp(4.75rem, 22vw, 6.5rem);
+  aspect-ratio: 1;
+  place-items: center;
+  margin-block: clamp(.55rem, 2vh, 1rem);
+}
 .orientation-device {
   position: relative;
-  width: clamp(4.75rem, 22vw, 6.5rem);
+  width: 100%;
   aspect-ratio: 1.7 / 1;
   border: clamp(2px, .7vw, 4px) solid var(--phosphor);
   border-radius: .4rem;
@@ -281,6 +288,12 @@ button { -webkit-tap-highlight-color: transparent; }
 .config-cell:nth-child(4), .config-cell:last-child { border-right: 0; }
 .config-cell:nth-last-child(-n + 3) { border-bottom: 0; }
 .config-cell.lower.wide { grid-column: span 2; }
+.config-cell[data-section="test"] {
+  display: grid;
+  grid-template-rows: 29% minmax(0, 1fr) auto;
+}
+.config-cell[data-section="test"] h2,
+.config-cell[data-section="test"] .option-list { min-height: 0; }
 .config-cell h2 {
   display: grid;
   min-height: 29%;
@@ -317,7 +330,7 @@ button { -webkit-tap-highlight-color: transparent; }
 .option-list button:hover, .option-list button:focus-visible, .run-test:hover, .run-test:focus-visible { background: #292600; }
 .option-list button.selected, .option-list button.selected:hover { background: var(--phosphor); color: #000; }
 .run-test {
-  margin-top: .15em;
+  margin-top: 0;
   border-block: 1px dashed var(--phosphor);
   font-size: clamp(.34rem, .78vw, .68rem);
 }

@@ -83,8 +83,9 @@ The automated suite covers:
 - Readable original GRiD face assignments across boot, configuration, telemetry, and command-overlay states
 - Optical decimal spacing for the fixed-cell TypeBlock countdown at initial, active, and critical values
 - Landscape-only phone and tablet operation with portrait interlock and safe firing suspension
+- Portrait rotation guidance with reserved animation clearance from the surrounding copy
 - Shallow iOS-style landscape viewports without a stale portrait interlock or horizontal overflow
-- Container-relative live telemetry at wide, shallow Safari viewport proportions
+- Container-relative configuration and live telemetry at wide, shallow Safari viewport proportions
 
 The interface has also been exercised in desktop and mobile browsers for boot, keyboard arming, view switching, firing, reload, the test routine, the alternating critical warning, the command dialog, touch input, responsive bounds, and console errors.
 
