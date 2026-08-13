@@ -343,6 +343,86 @@ test('shallow touch landscape never exposes the portrait interlock', async ({ br
   await context.close();
 });
 
+test('live telemetry scales inside a wide, shallow Safari landscape', async ({ browser }) => {
+  const context = await browser.newContext({
+    ...devices['iPhone 13 landscape'],
+    viewport: { width: 874, height: 390 }
+  });
+  const page = await context.newPage();
+  const browserErrors = [];
+  page.on('console', message => {
+    if (message.type() === 'error') browserErrors.push(message.text());
+  });
+  page.on('pageerror', error => browserErrors.push(error.message));
+
+  await page.goto('/');
+  await page.locator('#skipBoot').tap();
+  await page.locator('[data-command="view"]').tap();
+  await expect(page.locator('#telemetryView')).toBeVisible();
+  await expect(page.locator('#orientationLock')).toBeHidden();
+
+  const layout = await page.evaluate(() => {
+    const rect = (selector) => {
+      const box = document.querySelector(selector).getBoundingClientRect();
+      return { left: box.left, right: box.right, top: box.top, bottom: box.bottom };
+    };
+    const textRect = (selector) => {
+      const range = document.createRange();
+      range.selectNodeContents(document.querySelector(selector));
+      const box = range.getBoundingClientRect();
+      return { left: box.left, right: box.right, top: box.top, bottom: box.bottom };
+    };
+
+    return {
+      viewport: { width: innerWidth, height: innerHeight },
+      frame: rect('.terminal-frame'),
+      hint: rect('.outside-hint'),
+      header: rect('.telemetry-header'),
+      headerText: textRect('.telemetry-header h2'),
+      ammoCopy: textRect('.ammo-copy p'),
+      ammoOutput: rect('.ammo-readout output'),
+      ammoOutputText: textRect('.ammo-readout output'),
+      timeCopy: textRect('.time-readout p'),
+      timeOutput: rect('.time-readout output'),
+      timeOutputText: textRect('.time-readout output'),
+      meters: [...document.querySelectorAll('.meter')].map((meter) => {
+        const outer = meter.getBoundingClientRect();
+        const range = document.createRange();
+        range.selectNodeContents(meter.querySelector('p'));
+        const label = range.getBoundingClientRect();
+        return {
+          outer: { left: outer.left, right: outer.right, top: outer.top, bottom: outer.bottom },
+          label: { left: label.left, right: label.right, top: label.top, bottom: label.bottom }
+        };
+      }),
+      scrollY,
+      overflowX: document.documentElement.scrollWidth - innerWidth,
+      overflowY: document.documentElement.scrollHeight - innerHeight
+    };
+  });
+
+  const expectInside = (inner, outer) => {
+    expect(inner.left).toBeGreaterThanOrEqual(outer.left - 0.5);
+    expect(inner.right).toBeLessThanOrEqual(outer.right + 0.5);
+    expect(inner.top).toBeGreaterThanOrEqual(outer.top - 0.5);
+    expect(inner.bottom).toBeLessThanOrEqual(outer.bottom + 0.5);
+  };
+
+  expect(layout.frame.top).toBeGreaterThanOrEqual(0);
+  expect(layout.hint.bottom).toBeLessThanOrEqual(layout.viewport.height + 0.5);
+  expectInside(layout.headerText, layout.header);
+  expectInside(layout.ammoOutputText, layout.ammoOutput);
+  expectInside(layout.timeOutputText, layout.timeOutput);
+  expect(layout.ammoCopy.right).toBeLessThanOrEqual(layout.ammoOutput.left + 0.5);
+  expect(layout.timeCopy.right).toBeLessThanOrEqual(layout.timeOutput.left + 0.5);
+  layout.meters.forEach(({ label, outer }) => expectInside(label, outer));
+  expect(layout.scrollY).toBe(0);
+  expect(layout.overflowX).toBeLessThanOrEqual(0);
+  expect(layout.overflowY).toBeLessThanOrEqual(0);
+  expect(browserErrors).toEqual([]);
+  await context.close();
+});
+
 test('rotating to portrait safely ceases automatic engagement', async ({ browser }) => {
   const context = await browser.newContext({ ...devices['iPhone 13 landscape'] });
   const page = await context.newPage();

@@ -84,6 +84,7 @@ The automated suite covers:
 - Optical decimal spacing for the fixed-cell TypeBlock countdown at initial, active, and critical values
 - Landscape-only phone and tablet operation with portrait interlock and safe firing suspension
 - Shallow iOS-style landscape viewports without a stale portrait interlock or horizontal overflow
+- Container-relative live telemetry at wide, shallow Safari viewport proportions
 
 The interface has also been exercised in desktop and mobile browsers for boot, keyboard arming, view switching, firing, reload, the test routine, the alternating critical warning, the command dialog, touch input, responsive bounds, and console errors.
 

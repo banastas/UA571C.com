@@ -147,6 +147,7 @@ button { -webkit-tap-highlight-color: transparent; }
 }
 
 .terminal-frame {
+  container-type: inline-size;
   width: min(96vw, 1400px, 164svh);
   aspect-ratio: 1.84 / 1;
   padding: clamp(7px, 1vw, 14px);
@@ -590,6 +591,7 @@ button { -webkit-tap-highlight-color: transparent; }
 .outside-hint button { padding: .35rem .5rem; border: 1px solid #74766a; background: #141510; color: #cbccc0; cursor: pointer; font-size: inherit; letter-spacing: inherit; }
 
 .operator-panel {
+  container-type: inline-size;
   display: grid;
   grid-template-columns: minmax(14rem, 1fr) auto;
   width: min(96vw, 1400px, 164svh);
@@ -694,4 +696,55 @@ html[data-display-orientation="landscape"] .orientation-lock { display: none; }
   .scanlines { display: none; }
   .critical-warning span { background: var(--phosphor); color: #111000; }
   .orientation-device { transform: none; }
+}
+
+/*
+ * When browser chrome makes landscape especially shallow, the terminal width
+ * is constrained by viewport height. Scale the interface from its actual
+ * container instead of the much wider device viewport.
+ */
+@supports (width: 1cqw) {
+  .terminal-ui { padding: clamp(5px, .85cqw, 11px); }
+  .system-header h1,
+  .system-header h2,
+  .telemetry-header h2 { font-size: clamp(.9rem, 3.3cqw, 2.9rem); }
+  .roundel {
+    border-width: clamp(1px, .2cqw, 3px);
+    font-size: clamp(1.15rem, 5.6cqw, 4.75rem);
+  }
+  .config-cell h2,
+  .option-list button,
+  .run-test { font-size: clamp(.4rem, 1.15cqw, 1rem); }
+  .run-test { font-size: clamp(.34rem, .78cqw, .68rem); }
+  .readout p { font-size: clamp(.75rem, 3.65cqw, 3.18rem); }
+  .readout output { font-size: clamp(2rem, 7.2cqw, 6.3rem); }
+  .ammo-readout output { font-size: clamp(2rem, 6.9cqw, 6.05rem); }
+  .time-readout p { font-size: clamp(.62rem, 3.45cqw, 3rem); }
+  .time-readout output { font-size: clamp(1.7rem, 6.6cqw, 5.8rem); }
+  .pointer { font-size: clamp(1rem, 6.8cqw, 5.9rem); }
+  .critical-warning {
+    padding: clamp(2px, .35cqw, 6px);
+    border-width: clamp(3px, .45cqw, 8px);
+    font-size: clamp(.5rem, 1.25cqw, 1.12rem);
+  }
+  .activity { font-size: clamp(.33rem, .78cqw, .7rem); }
+  .fire-control { font-size: clamp(.28rem, .65cqw, .58rem); }
+  .engage-control { font-size: clamp(.28rem, .62cqw, .56rem); }
+  .meter p { font-size: clamp(.65rem, 2.8cqw, 2.42rem); }
+  .command-bar button { font-size: clamp(.3rem, .7cqw, .62rem); }
+  .command-bar span { font-size: clamp(.3rem, .72cqw, .64rem); }
+  .boot-mark { font-size: clamp(2rem, 7cqw, 5.8rem); }
+  .boot-line { font-size: clamp(.65rem, 1.65cqw, 1.42rem); }
+  .text-button { font-size: clamp(.45rem, .8cqw, .7rem); }
+  .help h2 { font-size: clamp(.8rem, 2cqw, 1.2rem); }
+  .help-grid { font-size: clamp(.58rem, 1.5cqw, .85rem); }
+}
+
+@supports (width: 1cqw) {
+  @media (max-width: 560px) {
+    .system-header h1,
+    .system-header h2,
+    .telemetry-header h2 { font-size: clamp(.72rem, 3.3cqw, .9rem); }
+    .pointer { font-size: clamp(.72rem, 4.2cqw, 1.2rem); }
+  }
 }

@@ -31,6 +31,8 @@ if (!css.includes('html[data-display-orientation="landscape"] .orientation-lock'
 if (!css.includes('html[data-display-orientation="portrait"] .orientation-lock')) errors.push('Missing synchronized portrait-state interlock');
 if (!app.includes('window.visualViewport')) errors.push('Orientation interlock must synchronize with the visual viewport');
 if (html.includes('orientation-mark')) errors.push('Orientation warning must use a single device-rotation cue');
+if (!css.includes('container-type: inline-size')) errors.push('Terminal typography must have a container-size reference');
+if (!css.includes('@supports (width: 1cqw)')) errors.push('Terminal typography must scale from its rendered container');
 
 for (const file of ['404.html', 'CNAME', '.nojekyll', '_headers', 'robots.txt', 'sitemap.xml', 'site.webmanifest']) {
   try {
