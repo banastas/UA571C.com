@@ -262,6 +262,8 @@ for (const deviceName of ['iPhone 13', 'iPad Pro 11']) {
     await expect(page.locator('#orientationLock')).toBeVisible();
     await expect(page.locator('#orientationLock')).toContainText('ROTATE DEVICE');
     await expect(page.locator('#orientationLock')).toContainText('LANDSCAPE MODE REQUIRED');
+    await expect(page.locator('#orientationLock .orientation-device')).toBeVisible();
+    await expect(page.locator('#orientationLock .orientation-mark')).toHaveCount(0);
     await expect(page.locator('.stage')).toBeHidden();
     await expect(page.locator('html')).toHaveAttribute('data-display-orientation', 'portrait');
     if (process.env.UA571C_CAPTURE_ORIENTATION && deviceName === 'iPhone 13') {
@@ -276,6 +278,24 @@ for (const deviceName of ['iPhone 13', 'iPad Pro 11']) {
     await context.close();
   });
 }
+
+test('synchronized orientation state controls one unambiguous rotation warning', async ({ page }) => {
+  await page.goto('/');
+
+  await page.evaluate(() => {
+    document.documentElement.dataset.displayOrientation = 'portrait';
+  });
+  await expect(page.locator('#orientationLock')).toBeVisible();
+  await expect(page.locator('#orientationLock .orientation-device')).toBeVisible();
+  await expect(page.locator('#orientationLock .orientation-mark')).toHaveCount(0);
+  await expect(page.locator('.stage')).toBeHidden();
+
+  await page.evaluate(() => {
+    document.documentElement.dataset.displayOrientation = 'landscape';
+  });
+  await expect(page.locator('#orientationLock')).toBeHidden();
+  await expect(page.locator('.stage')).toBeVisible();
+});
 
 test('shallow touch landscape never exposes the portrait interlock', async ({ browser }) => {
   const context = await browser.newContext({

@@ -28,7 +28,9 @@ if (!html.includes('application/ld+json')) errors.push('Missing structured data'
 if (manifest.orientation !== 'landscape') errors.push('Web app manifest must request landscape orientation');
 if (!css.includes('@media (orientation: portrait) and (pointer: coarse)')) errors.push('Missing portrait touch-device orientation interlock');
 if (!css.includes('html[data-display-orientation="landscape"] .orientation-lock')) errors.push('Missing stale portrait-query landscape override');
+if (!css.includes('html[data-display-orientation="portrait"] .orientation-lock')) errors.push('Missing synchronized portrait-state interlock');
 if (!app.includes('window.visualViewport')) errors.push('Orientation interlock must synchronize with the visual viewport');
+if (html.includes('orientation-mark')) errors.push('Orientation warning must use a single device-rotation cue');
 
 for (const file of ['404.html', 'CNAME', '.nojekyll', '_headers', 'robots.txt', 'sitemap.xml', 'site.webmanifest']) {
   try {

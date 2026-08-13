@@ -80,7 +80,19 @@ button { -webkit-tap-highlight-color: transparent; }
 }
 .skip-link:focus { transform: translate(-50%, .5rem); }
 
-.orientation-lock { display: none; }
+.orientation-lock {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: none;
+  min-height: 100svh;
+  place-items: center;
+  overflow: hidden;
+  padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+  background:
+    repeating-linear-gradient(to bottom, transparent 0 3px, #0004 4px 5px),
+    radial-gradient(circle at 50% 42%, #222319 0, #0e100c 45%, #020300 100%);
+}
 .orientation-panel {
   display: grid;
   width: min(84vw, 32rem);
@@ -94,19 +106,6 @@ button { -webkit-tap-highlight-color: transparent; }
   text-align: center;
   text-transform: uppercase;
 }
-.orientation-mark {
-  display: grid;
-  width: clamp(4.75rem, 23vw, 7rem);
-  aspect-ratio: 1;
-  place-items: center;
-  overflow: hidden;
-  border: var(--grid);
-  border-radius: 50%;
-  font-family: var(--font-grid-roundel);
-  font-size: clamp(3.4rem, 17vw, 5.25rem);
-  line-height: 1;
-}
-.orientation-mark span { transform: translate(.06em, .075em) scale(.88); }
 .orientation-panel p { margin: 0; font-size: clamp(.85rem, 4vw, 1.35rem); line-height: 1.25; }
 .orientation-panel strong { font-size: clamp(1rem, 5vw, 1.65rem); font-weight: 400; }
 .orientation-panel small { font-size: clamp(.55rem, 2.6vw, .8rem); }
@@ -630,19 +629,7 @@ button { -webkit-tap-highlight-color: transparent; }
 @media (orientation: portrait) and (pointer: coarse) {
   body { overflow: hidden; }
   .skip-link, .stage { display: none; }
-  .orientation-lock {
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    display: grid;
-    min-height: 100svh;
-    place-items: center;
-    overflow: hidden;
-    padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
-    background:
-      repeating-linear-gradient(to bottom, transparent 0 3px, #0004 4px 5px),
-      radial-gradient(circle at 50% 42%, #222319 0, #0e100c 45%, #020300 100%);
-  }
+  .orientation-lock { display: grid; }
 }
 
 /*
@@ -651,6 +638,10 @@ button { -webkit-tap-highlight-color: transparent; }
  * attribute from visualViewport so a stale portrait result cannot cover a
  * correctly sized landscape terminal.
  */
+html[data-display-orientation="portrait"] body { overflow: hidden; }
+html[data-display-orientation="portrait"] .skip-link,
+html[data-display-orientation="portrait"] .stage { display: none; }
+html[data-display-orientation="portrait"] .orientation-lock { display: grid; }
 html[data-display-orientation="landscape"] body { overflow-x: hidden; overflow-y: auto; }
 html[data-display-orientation="landscape"] .skip-link { display: inline; }
 html[data-display-orientation="landscape"] .stage { display: grid; }
