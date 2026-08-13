@@ -31,6 +31,7 @@ const activityOutput = $('#activityOutput');
 const faultFlash = $('#faultFlash');
 const configurationView = $('#configurationView');
 const telemetryView = $('#telemetryView');
+const portraitGate = matchMedia('(orientation: portrait) and (pointer: coarse)');
 
 const sectionMap = {
   mode: '#modeOptions',
@@ -241,11 +242,30 @@ function toggleSound() {
 
 async function toggleFullscreen() {
   try {
-    if (!document.fullscreenElement) await $('.terminal-frame').requestFullscreen();
+    if (!document.fullscreenElement) {
+      await $('.terminal-frame').requestFullscreen();
+      try {
+        await window.screen.orientation?.lock?.('landscape');
+      } catch {
+        // Most mobile browsers reserve orientation locking for installed apps.
+      }
+    }
     else await document.exitFullscreen();
   } catch {
     announce('FULLSCREEN UNAVAILABLE', true);
   }
+}
+
+function enforceLandscape() {
+  if (!portraitGate.matches) return;
+  if (autoTimer) window.clearInterval(autoTimer);
+  autoTimer = null;
+  stopFiring();
+  if (state.autoEngage) {
+    state = { ...ceaseFire(state), autoEngage: false };
+    render();
+  }
+  if (helpDialog.open) helpDialog.close();
 }
 
 function showHelp() {
@@ -338,6 +358,9 @@ document.addEventListener('keyup', (event) => {
 
 window.addEventListener('blur', stopFiring);
 document.addEventListener('visibilitychange', () => { if (document.hidden) stopFiring(); });
+if (portraitGate.addEventListener) portraitGate.addEventListener('change', enforceLandscape);
+else portraitGate.addListener?.(enforceLandscape);
+enforceLandscape();
 
 window.setInterval(() => {
   if (!state.firing && state.temperature > 18) {

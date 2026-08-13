@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto';
 const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
 const css = await readFile(new URL('../styles.css', import.meta.url), 'utf8');
 const app = await readFile(new URL('../src/app.mjs', import.meta.url), 'utf8');
+const manifest = JSON.parse(await readFile(new URL('../site.webmanifest', import.meta.url), 'utf8'));
 
 const errors = [];
 const ids = [...html.matchAll(/\sid="([^"]+)"/g)].map((match) => match[1]);
@@ -20,9 +21,12 @@ for (const required of ['<main', '<h1', 'aria-live=', '<dialog', 'prefers-reduce
 
 if (!html.includes('type="module"')) errors.push('Application script is not loaded as a module');
 if (!css.includes(':focus-visible')) errors.push('No visible keyboard focus styles found');
-if (!html.includes('<link rel="canonical" href="https://ua571c.com/">')) errors.push('Missing canonical UA571C.com URL');
+const canonical = html.match(/<link rel="canonical" href="([^"]+)">/)?.[1];
+if (!canonical || new URL(canonical).hostname.toLowerCase() !== 'ua571c.com') errors.push('Missing canonical UA571C.com URL');
 if (!html.includes('property="og:image"')) errors.push('Missing Open Graph preview image');
 if (!html.includes('application/ld+json')) errors.push('Missing structured data');
+if (manifest.orientation !== 'landscape') errors.push('Web app manifest must request landscape orientation');
+if (!css.includes('@media (orientation: portrait) and (pointer: coarse)')) errors.push('Missing portrait touch-device orientation interlock');
 
 for (const file of ['404.html', 'CNAME', '.nojekyll', '_headers', 'robots.txt', 'sitemap.xml', 'site.webmanifest']) {
   try {

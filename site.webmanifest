@@ -4,6 +4,7 @@
   "description": "A keyboard-controlled working-prop study of the UA 571-C remote sentry terminal.",
   "start_url": "/",
   "display": "fullscreen",
+  "orientation": "landscape",
   "background_color": "#020300",
   "theme_color": "#000000",
   "icons": [

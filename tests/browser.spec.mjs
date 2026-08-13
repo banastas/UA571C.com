@@ -214,7 +214,7 @@ test.describe('desktop terminal', () => {
 });
 
 test('touch controls fire and the terminal remains within the mobile viewport', async ({ browser }) => {
-  const context = await browser.newContext({ ...devices['iPhone 13'] });
+  const context = await browser.newContext({ ...devices['iPhone 13 landscape'] });
   const page = await context.newPage();
   const browserErrors = [];
   page.on('console', message => {
@@ -250,6 +250,44 @@ test('touch controls fire and the terminal remains within the mobile viewport', 
   if (process.env.CAPTURE_PREVIEWS) {
     await page.locator('.terminal-frame').screenshot({ path: 'preview-mobile.png' });
   }
+  await context.close();
+});
+
+for (const deviceName of ['iPhone 13', 'iPad Pro 11']) {
+  test(`${deviceName} portrait mode requires landscape`, async ({ browser }) => {
+    const context = await browser.newContext({ ...devices[deviceName] });
+    const page = await context.newPage();
+    await page.goto('/');
+
+    await expect(page.locator('#orientationLock')).toBeVisible();
+    await expect(page.locator('#orientationLock')).toContainText('ROTATE DEVICE');
+    await expect(page.locator('#orientationLock')).toContainText('LANDSCAPE MODE REQUIRED');
+    await expect(page.locator('.stage')).toBeHidden();
+    if (process.env.UA571C_CAPTURE_ORIENTATION && deviceName === 'iPhone 13') {
+      await page.screenshot({ path: '/tmp/ua571c-orientation.png' });
+    }
+
+    const portrait = page.viewportSize();
+    await page.setViewportSize({ width: portrait.height, height: portrait.width });
+    await expect(page.locator('#orientationLock')).toBeHidden();
+    await expect(page.locator('.stage')).toBeVisible();
+    await context.close();
+  });
+}
+
+test('rotating to portrait safely ceases automatic engagement', async ({ browser }) => {
+  const context = await browser.newContext({ ...devices['iPhone 13 landscape'] });
+  const page = await context.newPage();
+  await page.goto('/');
+  await page.locator('#skipBoot').tap();
+  await page.locator('#engageControl').tap();
+  await expect(page.locator('#engageControl')).toHaveText('[ E ] CEASE AUTO');
+
+  const landscape = page.viewportSize();
+  await page.setViewportSize({ width: landscape.height, height: landscape.width });
+  await expect(page.locator('#orientationLock')).toBeVisible();
+  await expect(page.locator('#engageControl')).toHaveText('[ E ] AUTO ENGAGE');
+  await expect(page.locator('#activityDot')).not.toHaveClass(/active/);
   await context.close();
 });
 

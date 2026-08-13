@@ -40,6 +40,8 @@ requires updating its filename and the matching `@font-face` URL.
 
 Every selector and command is also clickable or tappable. Audio is synthesized locally with the Web Audio API and begins only after user input.
 
+Phones and tablets operate in landscape. Installed/fullscreen mode requests a landscape display, while portrait browser sessions show a rotation interlock and safely cease any active or automatic fire until the device returns to landscape.
+
 ## Local development
 
 The site is intentionally build-free and has no runtime dependencies. Starting it locally requires only Python; the optional browser test suite uses Playwright.
@@ -80,6 +82,7 @@ The automated suite covers:
 - TypeBlock 24×32 display-order packing for legible unit roundels
 - Readable original GRiD face assignments across boot, configuration, telemetry, and command-overlay states
 - Optical decimal spacing for the fixed-cell TypeBlock countdown at initial, active, and critical values
+- Landscape-only phone and tablet operation with portrait interlock and safe firing suspension
 
 The interface has also been exercised in desktop and mobile browsers for boot, keyboard arming, view switching, firing, reload, the test routine, the alternating critical warning, the command dialog, touch input, responsive bounds, and console errors.
 
