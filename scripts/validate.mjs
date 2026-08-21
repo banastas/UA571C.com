@@ -4,6 +4,10 @@ import { createHash } from 'node:crypto';
 const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
 const css = await readFile(new URL('../styles.css', import.meta.url), 'utf8');
 const app = await readFile(new URL('../src/app.mjs', import.meta.url), 'utf8');
+const analytics = await readFile(new URL('../src/analytics.mjs', import.meta.url), 'utf8');
+const analyticsPage = await readFile(new URL('../src/analytics-page.mjs', import.meta.url), 'utf8');
+const notFound = await readFile(new URL('../404.html', import.meta.url), 'utf8');
+const headers = await readFile(new URL('../_headers', import.meta.url), 'utf8');
 const manifest = JSON.parse(await readFile(new URL('../site.webmanifest', import.meta.url), 'utf8'));
 
 const errors = [];
@@ -30,6 +34,18 @@ if (!css.includes('@media (orientation: portrait) and (pointer: coarse)')) error
 if (!css.includes('html[data-display-orientation="landscape"] .orientation-lock')) errors.push('Missing stale portrait-query landscape override');
 if (!css.includes('html[data-display-orientation="portrait"] .orientation-lock')) errors.push('Missing synchronized portrait-state interlock');
 if (!app.includes('window.visualViewport')) errors.push('Orientation interlock must synchronize with the visual viewport');
+if (!app.includes("from './analytics.mjs'")) errors.push('Application must use the shared analytics runtime');
+if (!analytics.includes("MEASUREMENT_ID = 'G-T97SY9N13B'")) errors.push('Google Analytics measurement ID is missing or incorrect');
+if (!analytics.includes("['ua571c.com', 'www.ua571c.com']")) errors.push('Analytics must be gated to approved production hosts');
+if (!analytics.includes('allow_google_signals: false')) errors.push('Google Signals must remain disabled');
+if (!analytics.includes('allow_ad_personalization_signals: false')) errors.push('Ad personalization signals must remain disabled');
+if (!analytics.includes('send_page_view: false')) errors.push('Page views must use the sanitized manual event');
+if (!analyticsPage.includes("pagePath: '/404'")) errors.push('404 analytics must use its canonical reporting path');
+if (!notFound.includes('src="/src/analytics-page.mjs"')) errors.push('404 page must load the shared analytics runtime');
+if (!headers.includes('script-src \'self\' https://www.googletagmanager.com')) errors.push('CSP must allow the Google tag script');
+for (const endpoint of ['https://www.google-analytics.com', 'https://region1.google-analytics.com']) {
+  if (!headers.includes(endpoint)) errors.push(`CSP must allow analytics collection endpoint: ${endpoint}`);
+}
 if (html.includes('orientation-mark')) errors.push('Orientation warning must use a single device-rotation cue');
 if (!html.includes('orientation-device-stage')) errors.push('Orientation warning must reserve clearance for its rotation animation');
 if (!css.includes('container-type: inline-size')) errors.push('Terminal typography must have a container-size reference');

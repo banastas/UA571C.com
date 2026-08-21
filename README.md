@@ -1,7 +1,7 @@
 # UA571C.com
 
 [![CI](https://github.com/banastas/UA571C.com/actions/workflows/ci.yml/badge.svg)](https://github.com/banastas/UA571C.com/actions/workflows/ci.yml)
-[![Checks](https://img.shields.io/badge/unit%20tests-14%20passing-817400?style=flat-square&labelColor=020300)](#verification)
+[![Checks](https://img.shields.io/badge/unit%20tests-20%20passing-817400?style=flat-square&labelColor=020300)](#verification)
 [![Runtime](https://img.shields.io/badge/runtime-zero%20dependencies-fff600?style=flat-square&labelColor=020300)](#local-development)
 
 A keyboard-controlled working-prop study of the UA 571-C remote sentry terminal from <a href="https://onesheet.org/movie/aliens-1986/">*Aliens*</a>.
@@ -39,6 +39,12 @@ requires updating its filename and the matching `@font-face` URL.
 | `Esc` | Cease fire or close the current overlay |
 
 Every selector and command is also clickable or tappable. Audio is synthesized locally with the Web Audio API and begins only after user input.
+
+## Analytics
+
+Google Analytics 4 (`G-T97SY9N13B`) measures the production terminal journey, including boot completion, selector changes, diagnostics, view changes, firing sessions, reloads, automatic engagement, sound/fullscreen/help use, faults, and the orientation interlock. The tag is production-host gated, excludes URL queries and fragments, disables Google Signals and ad-personalization signals, and never emits per-round events. Local development and hosting previews remain silent.
+
+The event and parameter contract, GA4 custom-definition map, privacy boundary, and runtime verification procedure are documented in [`docs/ANALYTICS.md`](docs/ANALYTICS.md).
 
 Phones and tablets operate in landscape. Installed/fullscreen mode requests a landscape display, while portrait browser sessions show a focused device-rotation interlock and safely cease any active or automatic fire until the device returns to landscape. The interlock follows the visual viewport during rotation so transient iOS Safari orientation-query lag cannot obscure the landscape terminal.
 
@@ -86,6 +92,7 @@ The automated suite covers:
 - Portrait rotation guidance with reserved animation clearance from the surrounding copy
 - Shallow iOS-style landscape viewports without a stale portrait interlock or horizontal overflow
 - Container-relative configuration and live telemetry at wide, shallow Safari viewport proportions
+- Production-only GA4 loading, sanitized page views, allowlisted events, and privacy-safe parameters
 
 The interface has also been exercised in desktop and mobile browsers for boot, keyboard arming, view switching, firing, reload, the test routine, the alternating critical warning, the command dialog, touch input, responsive bounds, and console errors.
 
@@ -110,12 +117,15 @@ styles.css              Responsive terminal, CRT, and interaction styling
 assets/fonts/           Original GRiD font objects and browser conversions
 src/app.mjs             DOM, keyboard, touch, audio, and animation behavior
 src/state.mjs           Pure terminal state machine
+src/analytics.mjs       Production-gated GA4 runtime and event contract
 tests/state.test.mjs    Node test suite
+tests/analytics.test.mjs Analytics host, privacy, and event-contract tests
 tests/browser.spec.mjs  Desktop and mobile interaction suite
 scripts/validate.mjs    Structural and deployment validation
 scripts/build-fonts.py  Reproducible GRiD .TYP to WOFF2 converter
 playwright.config.mjs   Local and CI browser-test configuration
 docs/CONCEPT.md         Product and experience rationale
+docs/ANALYTICS.md       GA4 event, parameter, privacy, and verification contract
 ```
 
 ## Design boundaries

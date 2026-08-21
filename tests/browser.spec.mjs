@@ -11,6 +11,99 @@ test('boot copy is readable and the full boot surface dismisses', async ({ page 
   await expect(page.locator('#terminalUi')).toBeVisible();
 });
 
+test('analytics stays completely silent on localhost', async ({ page }) => {
+  const googleRequests = [];
+  page.on('request', (request) => {
+    if (/google-analytics|googletagmanager/.test(request.url())) googleRequests.push(request.url());
+  });
+
+  await page.goto('/?private=value#fragment');
+  await page.locator('#skipBoot').click();
+  await page.keyboard.press('Digit2');
+  await page.keyboard.press('KeyV');
+
+  const runtime = await page.evaluate(() => ({
+    dataLayer: window.dataLayer,
+    gtagType: typeof window.gtag
+  }));
+  expect(runtime.dataLayer).toBeUndefined();
+  expect(runtime.gtagType).toBe('undefined');
+  expect(googleRequests).toEqual([]);
+});
+
+test('production runtime queues sanitized page and terminal events', async ({ browser, request }) => {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+
+  await page.route('https://www.googletagmanager.com/**', async (route) => {
+    await route.fulfill({ contentType: 'application/javascript', body: '' });
+  });
+  await page.route('https://ua571c.com/**', async (route) => {
+    const url = new URL(route.request().url());
+    const localResponse = await request.get(`http://127.0.0.1:4173${url.pathname}`);
+    await route.fulfill({ response: localResponse });
+  });
+
+  await page.goto('https://ua571c.com/?private=value#fragment');
+  await page.locator('#skipBoot').click();
+  await page.locator('#weaponOptions [data-value="ARMED"]').click();
+  await page.keyboard.press('KeyV');
+  await page.keyboard.down('Space');
+  await page.waitForTimeout(120);
+  await page.keyboard.up('Space');
+  await page.keyboard.press('KeyR');
+  await page.keyboard.press('Shift+/');
+
+  const queued = await page.evaluate(() => window.dataLayer.map((entry) => Array.from(entry)));
+  const config = queued.find(([command]) => command === 'config');
+  const events = queued.filter(([command]) => command === 'event');
+  const eventNames = events.map(([, name]) => name);
+  const firingEnded = events.find(([, name]) => name === 'terminal_firing_ended');
+
+  expect(config[1]).toBe('G-T97SY9N13B');
+  expect(config[2].page_location).toBe('https://ua571c.com/');
+  expect(config[2].page_location).not.toContain('private');
+  expect(config[2].send_page_view).toBe(false);
+  expect(eventNames).toEqual(expect.arrayContaining([
+    'page_view',
+    'terminal_boot_completed',
+    'terminal_configuration_changed',
+    'terminal_view_changed',
+    'terminal_firing_started',
+    'terminal_firing_ended',
+    'terminal_reloaded',
+    'terminal_help_opened'
+  ]));
+  expect(firingEnded[2].rounds_fired).toBeGreaterThan(0);
+  await context.close();
+});
+
+test('production 404 reports one canonical page view instead of the requested path', async ({ browser, request }) => {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+
+  await page.route('https://www.googletagmanager.com/**', async (route) => {
+    await route.fulfill({ contentType: 'application/javascript', body: '' });
+  });
+  await page.route('https://ua571c.com/**', async (route) => {
+    const url = new URL(route.request().url());
+    const localPath = url.pathname === '/missing/private-value' ? '/404.html' : url.pathname;
+    const localResponse = await request.get(`http://127.0.0.1:4173${localPath}`);
+    await route.fulfill({ response: localResponse });
+  });
+
+  await page.goto('https://ua571c.com/missing/private-value?email=person@example.com#fragment');
+  await expect(page.getByRole('heading', { name: 'Remote Link Lost' })).toBeVisible();
+  const queued = await page.evaluate(() => window.dataLayer.map((entry) => Array.from(entry)));
+  const pageViews = queued.filter(([command, name]) => command === 'event' && name === 'page_view');
+
+  expect(pageViews).toHaveLength(1);
+  expect(pageViews[0][2].page_location).toBe('https://ua571c.com/404');
+  expect(JSON.stringify(pageViews[0])).not.toContain('person@example.com');
+  expect(JSON.stringify(pageViews[0])).not.toContain('private-value');
+  await context.close();
+});
+
 test.describe('desktop terminal', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
