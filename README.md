@@ -1,27 +1,17 @@
 # UA571C.com
 
 [![CI](https://github.com/banastas/UA571C.com/actions/workflows/ci.yml/badge.svg)](https://github.com/banastas/UA571C.com/actions/workflows/ci.yml)
-[![Checks](https://img.shields.io/badge/unit%20tests-20%20passing-817400?style=flat-square&labelColor=020300)](#verification)
 [![Runtime](https://img.shields.io/badge/runtime-zero%20dependencies-fff600?style=flat-square&labelColor=020300)](#local-development)
 
-A keyboard-controlled working-prop study of the UA 571-C remote sentry terminal from <a href="https://onesheet.org/movie/aliens-1986/">*Aliens*</a>.
+A keyboard-controlled working-prop study of the UA 571-C remote sentry terminal from [*Aliens*](https://onesheet.org/movie/aliens-1986/).
 
-![The UA 571-C terminal running in a desktop browser](preview.png)
+**[Launch the terminal at UA571C.com](https://ua571c.com/)**
 
-UA571C.com is a product site that stays inside the product. There is no conventional landing page, navigation, feature grid, or gallery. The visitor boots directly into the fictional remote terminal, configures the system, runs its test routine, arms it, and watches 500 rounds disappear.
+[![The UA 571-C terminal showing 246 rounds remaining in a desktop browser](preview.png)](https://ua571c.com/)
 
-The interface is rebuilt in HTML, CSS, and JavaScript from visual references. No film stills, video, audio, frameworks, or third-party runtime services are shipped with the site. The terminal self-hosts browser conversions of the original 1984 GRiD bitmap font binaries preserved by [Thom Cherryhomes](https://github.com/tschak909), whose [UA571C reconstruction](https://github.com/tschak909/UA571C) includes the recovered GRiD development environment and source.
+UA571C.com stays inside the product. There is no conventional landing page, navigation, feature grid, or gallery. The visitor boots directly into the fictional remote terminal, configures the system, runs its test routine, arms it, and watches 500 rounds disappear.
 
-The recovered Pascal source maps TypeBlock 12×16 to the header and numeric readouts, TypeBlock 24×32 to the unit roundels, TypeBlock 9×12 to fields and telemetry labels, and TypeGRiD 5×8 to system text. In the responsive browser version, the header and counters use the original 24×32 companion face as well: it preserves the same GRiD construction at display sizes where the packed 12×16 strokes become ambiguous. The original `.TYP` objects, mechanical WOFF2 conversions, attribution, and reproducible converter are all included in [`assets/fonts`](assets/fonts/README.md).
-
-The current telemetry layout follows the clearest full-screen film reference, including its `D` roundels. `UA 571-C` is the weapon model; the roundel letter identifies the active sentry unit.
-
-The boot sequence completes automatically. Press `Escape`, activate the skip
-button, or click anywhere on the boot screen to enter the terminal immediately.
-
-Generated font assets use content-hashed filenames because Cloudflare serves
-them with a long immutable cache lifetime. Regenerating a font therefore also
-requires updating its filename and the matching `@font-face` URL.
+The interface is rebuilt in HTML, CSS, and JavaScript from visual references. It ships no film stills, video, recorded audio, framework, or third-party runtime library. Terminal audio is synthesized locally with the Web Audio API after user input.
 
 ## Controls
 
@@ -38,21 +28,24 @@ requires updating its filename and the matching `@font-face` URL.
 | `?` | Show the command overlay |
 | `Esc` | Cease fire or close the current overlay |
 
-Every selector and command is also clickable or tappable. Audio is synthesized locally with the Web Audio API and begins only after user input.
+Every selector and command also has a pointer and touch path. The boot sequence completes automatically. Press `Escape`, activate the skip button, or click the boot surface to enter the terminal immediately.
 
-## Analytics
+Phones and tablets operate in landscape. Installed and fullscreen modes request a landscape display. Portrait browser sessions show a focused rotation interlock and safely cease active or automatic fire until the device returns to landscape. Reduced-motion preferences skip the animated boot sequence.
 
-Google Analytics 4 (`G-T97SY9N13B`) measures the production terminal journey, including boot completion, selector changes, diagnostics, view changes, firing sessions, reloads, automatic engagement, sound/fullscreen/help use, faults, and the orientation interlock. The tag is production-host gated, excludes URL queries and fragments, disables Google Signals and ad-personalization signals, and never emits per-round events. Local development and hosting previews remain silent.
+## Original GRiD fonts
 
-The event and parameter contract, GA4 custom-definition map, privacy boundary, and runtime verification procedure are documented in [`docs/ANALYTICS.md`](docs/ANALYTICS.md).
+The terminal self-hosts browser conversions of the original 1984 GRiD bitmap font binaries preserved by [Thom Cherryhomes](https://github.com/tschak909), whose [UA571C reconstruction](https://github.com/tschak909/UA571C) includes the recovered GRiD development environment and Pascal source.
 
-Phones and tablets operate in landscape. Installed/fullscreen mode requests a landscape display, while portrait browser sessions show a focused device-rotation interlock and safely cease any active or automatic fire until the device returns to landscape. The interlock follows the visual viewport during rotation so transient iOS Safari orientation-query lag cannot obscure the landscape terminal.
+The recovered source maps TypeBlock 12×16 to headers and numeric readouts, TypeBlock 24×32 to unit roundels, TypeBlock 9×12 to fields and telemetry labels, and TypeGRiD 5×8 to system text. This responsive browser version uses the original 24×32 companion face for headers and counters because its strokes remain legible at display sizes where the packed 12×16 face becomes ambiguous.
+
+The original `.TYP` objects, deterministic WOFF2 conversions, attribution, and reproducible converter are documented in [`assets/fonts`](assets/fonts/README.md). Generated font filenames contain a content digest because production serves them with an immutable cache lifetime.
 
 ## Local development
 
-The site is intentionally build-free and has no runtime dependencies. Starting it locally requires only Python; the optional browser test suite uses Playwright.
+The site is build-free and has no runtime dependencies. Node.js 20 or newer is required for the development and browser-test tooling.
 
 ```sh
+npm ci
 npm start
 ```
 
@@ -60,83 +53,81 @@ Open <http://localhost:4173>.
 
 ## Verification
 
+Run the fast state, analytics, font, structure, metadata, deployment, and accessibility checks:
+
 ```sh
 npm run check
 ```
 
-For the desktop and mobile browser suite:
+Install Chromium once, then run the complete browser suite:
 
 ```sh
-npm install
 npx playwright install chromium
-npm run test:browser
+npm run check:all
 ```
 
-The automated suite covers:
+The browser suite exercises desktop and mobile boot behavior, controls, state transitions, film-matched timing, critical warnings, responsive bounds, accessibility names, orientation safety, analytics privacy, the 404 route, and console errors. CI runs both layers on every push to `main` and every pull request.
 
-- Reference-screen defaults and the 500-round initial state
-- Selector cycling, wrapping, and invalid input
-- Safe and armed firing gates
-- Ammunition depletion and automatic cutoff
-- Thermal cutoff, cooling, cease fire, and reload
-- Film-matched 15-round-per-second countdown and 50-round critical threshold
-- Unique DOM identifiers and application hooks
-- Module loading, canonical metadata, and accessibility affordances
-- Required deployment files
-- Original GRiD object metrics, one-based strike decoding, and the `81H` pointer glyph
-- TypeBlock 9×12 and 12×16 low-bit cell alignment for clean labels and headers
-- TypeBlock 24×32 display-order packing for legible unit roundels
-- Readable original GRiD face assignments across boot, configuration, telemetry, and command-overlay states
-- Optical decimal spacing for the fixed-cell TypeBlock countdown at initial, active, and critical values
-- Landscape-only phone and tablet operation with portrait interlock and safe firing suspension
-- Portrait rotation guidance with reserved animation clearance from the surrounding copy
-- Shallow iOS-style landscape viewports without a stale portrait interlock or horizontal overflow
-- Container-relative configuration and live telemetry at wide, shallow Safari viewport proportions
-- Production-only GA4 loading, sanitized page views, allowlisted events, and privacy-safe parameters
+### Refreshing the social preview
 
-The interface has also been exercised in desktop and mobile browsers for boot, keyboard arming, view switching, firing, reload, the test routine, the alternating critical warning, the command dialog, touch input, responsive bounds, and console errors.
+The README image and Open Graph card are the same deterministic 1152×627 capture. Regenerate it from the current local source with:
+
+```sh
+npm run capture:preview
+```
+
+The capture reproduces the film-reference telemetry moment at 246 rounds remaining. Structural validation checks the PNG type and dimensions against the page metadata so the social card cannot silently drift.
+
+## Analytics and privacy
+
+Google Analytics 4 measures the production terminal journey, including boot completion, selector changes, diagnostics, view changes, firing sessions, reloads, automatic engagement, sound, fullscreen, help use, faults, and the orientation interlock.
+
+Analytics is gated to the production hostname, strips URL queries and fragments, disables Google Signals and ad-personalization signals, and never emits per-round events. Local development and hosting previews remain silent. The complete event contract, custom-definition map, privacy boundary, and live verification procedure are in [`docs/ANALYTICS.md`](docs/ANALYTICS.md).
 
 ## Deployment
 
 The repository root is the deployable static artifact. No build command is required.
 
-- **Publish directory:** `/`
-- **Build command:** none
-- **Canonical domain:** `https://ua571c.com/`
-- **Fallback:** `404.html`
+| Setting | Value |
+| --- | --- |
+| Publish directory | `/` |
+| Build command | None |
+| Canonical domain | `https://ua571c.com/` |
+| Not-found page | `404.html` |
 
-`CNAME` supports GitHub Pages. `_headers` provides compatible security headers on Cloudflare Pages and Netlify. `.nojekyll` prevents GitHub Pages from applying Jekyll processing.
-
-DNS and hosting configuration remain external to this repository.
+`CNAME` supports GitHub Pages. `_headers` provides compatible security and cache headers on Cloudflare Pages and Netlify. `.nojekyll` prevents GitHub Pages from applying Jekyll processing. DNS and hosting configuration remain external to this repository.
 
 ## Project structure
 
 ```text
-index.html              Terminal markup and site metadata
-styles.css              Responsive terminal, CRT, and interaction styling
-assets/fonts/           Original GRiD font objects and browser conversions
-src/app.mjs             DOM, keyboard, touch, audio, and animation behavior
-src/state.mjs           Pure terminal state machine
-src/analytics.mjs       Production-gated GA4 runtime and event contract
-tests/state.test.mjs    Node test suite
-tests/analytics.test.mjs Analytics host, privacy, and event-contract tests
-tests/browser.spec.mjs  Desktop and mobile interaction suite
-scripts/validate.mjs    Structural and deployment validation
-scripts/build-fonts.py  Reproducible GRiD .TYP to WOFF2 converter
-playwright.config.mjs   Local and CI browser-test configuration
-docs/CONCEPT.md         Product and experience rationale
-docs/ANALYTICS.md       GA4 event, parameter, privacy, and verification contract
+index.html                       Terminal markup, metadata, and structured data
+styles.css                       Responsive terminal, CRT, and interaction styling
+404.html                         Branded not-found page
+preview.png                      README and social-card capture
+assets/fonts/                    Original GRiD objects and browser conversions
+src/app.mjs                      DOM, input, audio, animation, and orientation behavior
+src/state.mjs                    Pure terminal state machine
+src/analytics.mjs                Production-gated GA4 runtime and event contract
+src/analytics-page.mjs           Canonical analytics entry point for the 404 page
+tests/*.test.mjs                 Node state, font, and analytics tests
+tests/browser.spec.mjs           Desktop and mobile Playwright suite
+scripts/validate.mjs             Structural and deployment validation
+scripts/build-fonts.py           Reproducible GRiD .TYP to WOFF2 converter
+playwright.config.mjs            Local and CI browser-test configuration
+docs/CONCEPT.md                  Product and experience rationale
+docs/ANALYTICS.md                Analytics event and privacy contract
+.github/workflows/ci.yml         Continuous integration
 ```
 
 ## Design boundaries
 
-- The interface itself is the product demonstration and the entire product site.
+- The interface is the product demonstration and the entire product site.
 - The crude grid, yellow phosphor, hard selection bars, and finite ammunition state are the identity.
 - Explanatory material stays outside the live terminal so the working-prop illusion survives.
 - The project is a fan-made interface study, not an official product or a simulation of a real weapon system.
-- Motion preferences are respected, and every interaction has a keyboard and pointer path.
+- Motion preferences are respected, and every interaction has keyboard and pointer paths.
 
-See [the concept note](docs/CONCEPT.md) for the complete rationale.
+The current telemetry layout follows the clearest full-screen film reference, including its `D` roundels. `UA 571-C` is the fictional weapon model, while the roundel letter identifies the active sentry unit. See [the concept note](docs/CONCEPT.md) for the complete rationale.
 
 ## Acknowledgment
 

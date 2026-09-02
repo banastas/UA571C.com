@@ -10,12 +10,18 @@
     "url": "https://github.com/banastas/UA571C.com.git"
   },
   "scripts": {
-    "start": "python3 -m http.server 4173",
+    "start": "python3 -m http.server 4173 --bind 127.0.0.1",
+    "start:test": "python3 -m http.server 5710 --bind 127.0.0.1",
     "serve": "npm start",
     "test": "node --test tests/*.test.mjs",
     "test:browser": "playwright test",
+    "capture:preview": "CAPTURE_PREVIEW=1 playwright test --grep \"film-reference preview\"",
     "validate": "node scripts/validate.mjs",
-    "check": "npm test && npm run validate"
+    "check": "npm test && npm run validate",
+    "check:all": "npm run check && npm run test:browser"
+  },
+  "engines": {
+    "node": ">=20"
   },
   "devDependencies": {
     "@playwright/test": "1.62.0"

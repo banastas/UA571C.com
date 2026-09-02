@@ -9,6 +9,7 @@ const analyticsPage = await readFile(new URL('../src/analytics-page.mjs', import
 const notFound = await readFile(new URL('../404.html', import.meta.url), 'utf8');
 const headers = await readFile(new URL('../_headers', import.meta.url), 'utf8');
 const manifest = JSON.parse(await readFile(new URL('../site.webmanifest', import.meta.url), 'utf8'));
+const preview = await readFile(new URL('../preview.png', import.meta.url));
 
 const errors = [];
 const ids = [...html.matchAll(/\sid="([^"]+)"/g)].map((match) => match[1]);
@@ -26,8 +27,22 @@ for (const required of ['<main', '<h1', 'aria-live=', '<dialog', 'prefers-reduce
 if (!html.includes('type="module"')) errors.push('Application script is not loaded as a module');
 if (!css.includes(':focus-visible')) errors.push('No visible keyboard focus styles found');
 const canonical = html.match(/<link rel="canonical" href="([^"]+)">/)?.[1];
-if (!canonical || new URL(canonical).hostname.toLowerCase() !== 'ua571c.com') errors.push('Missing canonical UA571C.com URL');
+if (canonical !== 'https://ua571c.com/') errors.push('Canonical URL must use the canonical lowercase production origin');
 if (!html.includes('property="og:image"')) errors.push('Missing Open Graph preview image');
+if (!html.includes('property="og:image:type" content="image/png"')) errors.push('Open Graph preview image type is missing');
+const previewIsPng = preview.length >= 24 && preview.toString('ascii', 1, 4) === 'PNG';
+if (!previewIsPng) {
+  errors.push('preview.png is not a valid PNG file');
+} else {
+  const previewWidth = preview.readUInt32BE(16);
+  const previewHeight = preview.readUInt32BE(20);
+  const metadataWidth = Number(html.match(/property="og:image:width" content="(\d+)"/)?.[1]);
+  const metadataHeight = Number(html.match(/property="og:image:height" content="(\d+)"/)?.[1]);
+  if (previewWidth !== 1152 || previewHeight !== 627) errors.push('preview.png must remain 1152x627');
+  if (metadataWidth !== previewWidth || metadataHeight !== previewHeight) {
+    errors.push('Open Graph image dimensions do not match preview.png');
+  }
+}
 if (!html.includes('application/ld+json')) errors.push('Missing structured data');
 if (manifest.orientation !== 'landscape') errors.push('Web app manifest must request landscape orientation');
 if (!css.includes('@media (orientation: portrait) and (pointer: coarse)')) errors.push('Missing portrait touch-device orientation interlock');

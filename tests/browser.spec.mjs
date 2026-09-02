@@ -40,7 +40,7 @@ test('production runtime queues sanitized page and terminal events', async ({ br
   });
   await page.route('https://ua571c.com/**', async (route) => {
     const url = new URL(route.request().url());
-    const localResponse = await request.get(`http://127.0.0.1:4173${url.pathname}`);
+    const localResponse = await request.get(`http://127.0.0.1:5710${url.pathname}`);
     await route.fulfill({ response: localResponse });
   });
 
@@ -88,7 +88,7 @@ test('production 404 reports one canonical page view instead of the requested pa
   await page.route('https://ua571c.com/**', async (route) => {
     const url = new URL(route.request().url());
     const localPath = url.pathname === '/missing/private-value' ? '/404.html' : url.pathname;
-    const localResponse = await request.get(`http://127.0.0.1:4173${localPath}`);
+    const localResponse = await request.get(`http://127.0.0.1:5710${localPath}`);
     await route.fulfill({ response: localResponse });
   });
 
@@ -142,10 +142,6 @@ test.describe('desktop terminal', () => {
     await page.keyboard.press('Escape');
     await expect(page.locator('#helpDialog')).toBeHidden();
     expect(browserErrors).toEqual([]);
-
-    if (process.env.CAPTURE_PREVIEWS) {
-      await page.locator('.terminal-frame').screenshot({ path: 'preview-config.png' });
-    }
   });
 
   test('every terminal screen uses a readable GRiD face', async ({ page }) => {
@@ -273,7 +269,7 @@ test.describe('desktop terminal', () => {
     expect(layout.accessibleValue).toBe('30.53 seconds of ammunition remaining');
   });
 
-  test('critical warning appears at 50 rounds and alternates polarity', async ({ page }) => {
+  test('film-reference preview and critical warning remain accurate', async ({ page }) => {
     await page.keyboard.press('Digit2');
     await page.keyboard.press('KeyV');
     await page.locator('#fireControl').evaluate((button) => {
@@ -285,7 +281,7 @@ test.describe('desktop terminal', () => {
 
     await expect(page.locator('#ammoOutput')).toHaveText('246');
     await expect(page.locator('#timeOutput')).toHaveText('16.40');
-    if (process.env.CAPTURE_PREVIEWS) {
+    if (process.env.CAPTURE_PREVIEW) {
       // Capture the exact film-reference moment as an in-progress burst.
       await page.locator('#rpmGauge').evaluate((gauge) => gauge.style.height = '25%');
       await page.waitForTimeout(160);
@@ -340,9 +336,6 @@ test('touch controls fire and the terminal remains within the mobile viewport', 
   expect(frame.x + frame.width).toBeLessThanOrEqual(viewport.width + 0.5);
   expect(compactDecimal).toBe(true);
   expect(browserErrors).toEqual([]);
-  if (process.env.CAPTURE_PREVIEWS) {
-    await page.locator('.terminal-frame').screenshot({ path: 'preview-mobile.png' });
-  }
   await context.close();
 });
 
