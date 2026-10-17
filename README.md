@@ -9,7 +9,7 @@ A keyboard-controlled working-prop study of the UA 571-C remote sentry terminal 
 
 [![The UA 571-C terminal showing 246 rounds remaining in a desktop browser](preview.png)](https://ua571c.com/)
 
-UA571C.com stays inside the product. There is no conventional landing page, navigation, feature grid, or gallery. The visitor boots directly into the fictional remote terminal, configures the system, runs its test routine, arms it, and watches 500 rounds disappear.
+UA571C.com opens directly into the fictional remote terminal, without a separate landing page, navigation, feature grid, or gallery. The visitor configures the system, runs its test routine, arms it, and fires up to 500 simulated rounds.
 
 The interface is rebuilt in HTML, CSS, and JavaScript from visual references. It ships no film stills, video, recorded audio, framework, or third-party runtime library. Terminal audio is synthesized locally with the Web Audio API after user input.
 
